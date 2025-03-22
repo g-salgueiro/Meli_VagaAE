@@ -1,12 +1,17 @@
 import requests
-import pandas as pd
 from typing import List, Dict
 from auth import TOKEN
-from datetime import datetime
 
 
 def tratar_erro_http(status_code: int) -> str:
-    """Retorna mensagem amigável para códigos de erro HTTP específicos"""
+    """Retorna mensagem amigável para códigos de erro HTTP específicos
+
+    Args:
+        status_code (int): Código de status HTTP recebido
+
+    Returns:
+        str: Mensagem de erro contextualizada em português
+    """
     mensagens_erro = {
         400: "Erro 400 - Erro de request",
         401: "Erro 401 - Usuário não autenticado",
@@ -20,7 +25,18 @@ def tratar_erro_http(status_code: int) -> str:
 
 
 def buscar_itens(query: str, limit: int = 50) -> List[str]:
-    """Busca itens no Mercado Livre por query e retorna lista de IDs"""
+    """Busca itens no Mercado Livre por query e retorna lista de IDs
+
+    Args:
+        query (str): Termo de busca para pesquisar no Mercado Livre
+        limit (int, optional): Quantidade máxima de resultados. Padrão: 50
+
+    Returns:
+        List[str]: Lista de IDs dos itens encontrados
+
+    Raises:
+        Exception: Erros de HTTP com mensagens tratadas ou erros genéricos
+    """
     headers = {'Authorization': f'Bearer {TOKEN}'}
     url = f'https://api.mercadolibre.com/sites/MLA/search?q={query}&limit={limit}'
     try:
@@ -36,7 +52,17 @@ def buscar_itens(query: str, limit: int = 50) -> List[str]:
 
 
 def obter_detalhes_item(item_id: str) -> Dict:
-    """Obtém detalhes completos de um item específico"""
+    """Obtém detalhes completos de um item específico
+
+    Args:
+        item_id (str): ID do item no Mercado Livre
+
+    Returns:
+        Dict: Dicionário com metadados completos do item
+
+    Raises:
+        Exception: Erros de HTTP com mensagens tratadas ou erros genéricos
+    """
     headers = {'Authorization': f'Bearer {TOKEN}'}
     url = f'https://api.mercadolibre.com/items/{item_id}'
     try:

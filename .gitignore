@@ -1,0 +1,24 @@
+# macOS hidden files
+.DS_Store
+.AppleDouble
+
+# IDE configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment files
+.env
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Output directories
+output/
+
+# Local development files
+*.log
+*.tmp

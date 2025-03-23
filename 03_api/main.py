@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from datetime import datetime
 from funcs import buscar_itens, obter_detalhes_item
@@ -11,7 +12,9 @@ TERMOS_BUSCA = [
 ]
 
 # Diretório de saída
-ARQUIVO_SAIDA = f'output/{datetime.now().strftime("%Y%m%d%H%M%S")}_output.csv'
+output_dir = os.path.join(os.path.dirname(__file__), 'output')
+os.makedirs(output_dir, exist_ok=True)
+ARQUIVO_SAIDA = os.path.join(output_dir, f'{datetime.now().strftime("%Y%m%d%H%M%S")}_output.csv')
 
 # Inicialização de variáveis
 todos_dados = []
@@ -26,9 +29,19 @@ for termo in TERMOS_BUSCA:
     try:
         print(f' \nProcessando: {termo}')
         
-        # Busca IDs de itens usando a função buscar_itens
-        ids_itens = buscar_itens(termo, 50)
+        # Busca paginada por até 150 itens (3 páginas de 50)
+        ids_itens = []
+        for offset in [0, 50, 100]:
+            try:
+                print(f'Buscando página {offset//50 + 1} para "{termo}"')
+                pagina_ids = buscar_itens(termo, 50, offset)
+                ids_itens.extend(pagina_ids)
+            except Exception as e:
+                print(f'Erro na página {offset//50 + 1}: {str(e)}')
+                continue
         
+        # Remove duplicados e verifica resultados
+        ids_itens = list(set(ids_itens))
         if not ids_itens:
             print(f'Nenhum item encontrado para "{termo}"')
             continue

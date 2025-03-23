@@ -99,6 +99,13 @@
         3. Consolidação em Dataframe `pandas`
         4. Exportação para CSV
 
+    - **Paginação e Controle de Requisições**:
+        - Mecanismo de 3 requisições por termo (offset 0, 50, 100), conforme limite da API
+        - Parâmetros `limit=50` e `offset` para controle da API
+        - Remoção de duplicados com `list(set())` após coleta
+        - Respeito ao limite máximo da API (150 itens por termo)
+        - Controle de erros por página com retentativas automáticas
+
     - Técnicas:
         - Uso de `pandas` para manipulação de dados
         - Nomeação dinâmica do arquivo de saída com timestamp

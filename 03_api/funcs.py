@@ -1,7 +1,7 @@
 import requests
 from typing import List, Dict
 from auth import TOKEN
-
+from tenacity import retry, wait_exponential
 
 def tratar_erro_http(status_code: int) -> str:
     """Retorna mensagem amigável para códigos de erro HTTP específicos
@@ -23,8 +23,8 @@ def tratar_erro_http(status_code: int) -> str:
     }
     return mensagens_erro.get(status_code, f"Erro {status_code} - Erro desconhecido")
 
-
-def buscar_itens(query: str, limit: int = 50) -> List[str]:
+@retry(wait=wait_exponential(multiplier=1, min=2, max=30))
+def buscar_itens(query: str, limit: int = 50, offset: int = 0) -> List[str]:
     """Busca itens no Mercado Livre por query e retorna lista de IDs
 
     Args:
@@ -38,7 +38,7 @@ def buscar_itens(query: str, limit: int = 50) -> List[str]:
         Exception: Erros de HTTP com mensagens tratadas ou erros genéricos
     """
     headers = {'Authorization': f'Bearer {TOKEN}'}
-    url = f'https://api.mercadolibre.com/sites/MLA/search?q={query}&limit={limit}'
+    url = f'https://api.mercadolibre.com/sites/MLA/search?q={query}&limit={limit}&offset={offset}'
     try:
         response = requests.get(url, headers=headers)
         response.raise_for_status()
@@ -50,7 +50,7 @@ def buscar_itens(query: str, limit: int = 50) -> List[str]:
     except Exception as e:
         raise Exception(f"Erro ao buscar itens: {str(e)}") from e
 
-
+@retry(wait=wait_exponential(multiplier=1, min=2, max=30))
 def obter_detalhes_item(item_id: str) -> Dict:
     """Obtém detalhes completos de um item específico
 

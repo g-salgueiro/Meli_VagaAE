@@ -14,6 +14,7 @@ venv/
 
 # Python cache
 __pycache__/
+
 *.py[cod]
 
 # Output directories
@@ -22,3 +23,4 @@ output/
 # Local development files
 *.log
 *.tmp
+/03_api/output/*

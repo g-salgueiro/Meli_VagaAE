@@ -74,7 +74,7 @@ ORDER BY sale_month, rank_position;
 -- Tarefa 3: Tabela de histórico e Stored Procedure
 
 Estou pegando de Post porque nao vejo sentido em pegar o valor de um Produto generico, 
-visto que cada item pode ter um valor diferente dependendo do vendedor.ABORT
+visto que cada item pode ter um valor diferente dependendo do vendedor.
 
 Penso que so faria sentido pegar o preço de Product, por exemplo, caso seja necessario um 
 preço padrao para todos os itens (mas daí é possivel alterar fazendo Joins; nao compensa ter arquitetura diferente)

@@ -42,16 +42,21 @@
      - Timestamp
      - Tipo de erro
      - Contexto da operação
-
+   - Política de retentativas com Tenacity:
+     - Backoff exponencial entre tentativas (wait_exponential)
+     - Relançamento de exceções após esgotar tentativas
 ### Decisões de Projeto:
-1. **Persistência de Dados**:
+1. **Resiliência de Requisições**:
+   - Uso da biblioteca Tenacity para retentativas inteligentes
+   - Configuração balanceada entre carga do servidor e confiabilidade
+2. **Persistência de Dados**:
    - CSV para compatibilidade com BI
    - Checkpoints parciais para recuperação
-2. **Separação de Conceitos**: 
+3. **Separação de Conceitos**: 
     - Camada de autenticação (auth)
     - Lógica de negócio (funcs)
     - Orquestração (main)
-3. **Logging**:    
+4. **Logging**:    
     - Mensagens de erro em português
     - Logging detalhado por item/termo
 
@@ -90,6 +95,8 @@
     - *Técnicas*:
         - Type hints para melhor tipagem
         - Exceções customizadas com mensagens em português
+        - Implementação de retentativas com @retry do Tenacity:
+          - wait=wait_exponential(multiplier=1, max=10)
         - Separação clara entre lógica de negócio e tratamento de erros
 
 3. **main.py**

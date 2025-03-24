@@ -149,7 +149,7 @@
     - *Técnicas*:
         - Type hints para melhor tipagem
         - Exceções customizadas com mensagens em português
-        - Implementação de retentativas com @retry do Tenacity:
+        - Implementação de retentativas com @retry do `tenacity`:
           - wait=wait_exponential(multiplier=1, max=10)
         - Separação clara entre lógica de negócio e tratamento de erros
 

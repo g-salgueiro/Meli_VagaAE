@@ -13,13 +13,65 @@
   - `Product` (Informações técnicas dos produtos)
   - `Post` (Anúncios vinculados a produtos e vendedores)
   - `Sale` (Transações de vendas com cálculos armazenados)
+  - `ItemHistory` (Histórico de preços/status dos anúncios)
 
   **Tabelas adicionais não solicitadas:**
-  - `ItemHistory` (Histórico de preços/status dos anúncios)
   - `PaymentMethod` (Métodos de pagamento dos clientes)
   - `FinancialTransaction` (Transações financeiras)
   - `Carrier` (Transportadoras parceiras)
   - `DeliveryTracking` (Rastreamento de entregas)
+
+### Detalhamento das Tabelas Principais
+
+1. **Customer**
+   - Armazena dados de clientes e vendedores com flag `is_seller`
+   - Campos principais: `customer_id` (PK), `customer_email` (UNIQUE), `first_name`, `last_name`, `birth_date`
+   - Auditoria: `created_at`, `updated_at` com atualização automática
+
+2. **Category**
+   - Implementa hierarquia de categorias com auto-relacionamento
+   - Campos principais: `category_id` (PK), `category_name` (UNIQUE), `parent_id` (FK), `hierarchy_path`
+   - Permite navegação eficiente na árvore de categorias
+
+3. **Product**
+   - Armazena informações técnicas dos produtos
+   - Campos principais: `product_id` (PK), `product_name`, `product_description`, `category_id` (FK)
+   - Separado de `Post` para permitir múltiplos anúncios do mesmo produto
+
+4. **Post**
+   - Representa anúncios específicos de vendedores
+   - Campos principais: `post_id` (PK), `product_id` (FK), `seller_id` (FK), `post_price`, `post_status`
+   - Status controlado via ENUM ('active', 'inactive')
+
+5. **Sale**
+   - Registra transações de vendas
+   - Campos principais: `sale_id` (PK), `buyer_id` (FK), `post_id` (FK), `quantity`, `unit_price`
+   - Coluna calculada: `sale_total` (GENERATED ALWAYS AS quantity * unit_price STORED)
+   - Status controlado via ENUM ('pending', 'completed', 'cancelled', 'refunded')
+
+6. **ItemHistory**
+   - Histórico de preços e status dos anúncios
+   - Chave composta: (`post_id`, `snapshot_date`)
+   - Permite análise temporal de variações de preço
+
+### Consultas Analíticas (`respuestas_negocio.sql`)
+
+1. **Aniversariantes com Alto Volume de Vendas**
+   - Identifica vendedores que fazem aniversário hoje e tiveram mais de 1500 vendas em janeiro/2020
+   - Técnicas: Subquery correlacionada, funções de data (MONTH, DAY), filtros booleanos
+
+2. **Top 5 Vendedores por Mês na Categoria Smartphones**
+   - Ranking mensal dos melhores vendedores de smartphones em 2020
+   - Técnicas avançadas:
+     - Common Table Expressions (WITH)
+     - Window Functions (ROW_NUMBER, PARTITION BY, ORDER BY)
+     - Agregações (SUM) com agrupamento
+
+3. **Stored Procedure para Histórico de Preços**
+   - `GenerateDailyItemHistory`: Gera snapshots diários de preços e status
+   - Implementa lógica de INSERT ... ON DUPLICATE KEY UPDATE
+   - Parâmetros: data alvo (opcional, default = data atual)
+   - Uso: `CALL GenerateDailyItemHistory('2020-01-02')`
 
 ### Principais Decisões Implementadas:
 1. Separação física entre `Product` (dados técnicos) e `Post` (contexto comercial)
@@ -27,6 +79,8 @@
 3. Constraints de integridade referencial entre todas as tabelas relacionadas
 4. Campos timestamp (created_at/updated_at) para auditoria em todas as entidades
 5. Coluna gerada (sale_total) para cálculo automático do total da venda
+6. Chaves compostas para otimização de consultas históricas
+7. ENUMs para controle de status em diversas entidades
 
 ## 03. Módulo API (`03_api`)
 
